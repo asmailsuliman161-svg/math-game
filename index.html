@@ -1,1 +1,143 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>منصة الأستاذ إسماعيل سليمان حسن التعليمية – ربك – كنانة</title>
+<style>
+  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin:0; padding:0; background: #f0f2f5; }
+  .container { max-width: 600px; margin: auto; padding: 20px; background: white; border-radius: 10px; box-shadow: 0 0 15px rgba(0,0,0,0.1); text-align:center; }
+  h2 { color:#2c3e50; }
+  input { padding:10px; width:80%; margin:10px 0; border-radius:5px; border:1px solid #ccc; }
+  button { padding:10px 20px; margin:5px; border:none; border-radius:5px; cursor:pointer; background:#3498db; color:white; font-weight:bold; }
+  button:hover { background:#2980b9; }
+  #feedback { margin-top:15px; font-weight:bold; }
+  .header { margin-bottom:15px; }
+  .name { font-size:20px; font-weight:bold; color:#2c3e50; }
+  .desc { font-size:14px; color:#555; }
+  #lesson { text-align:right; margin:15px 0; background:#ecf0f1; padding:10px; border-radius:5px; display:none; }
+  #leaderboard { margin-top:20px; display:none; text-align:left; }
+  #leaderboard h3 { text-align:center; color:#e67e22; }
+  #login { display:block; }
+  #game { display:none; }
+</style>
+</head>
+<body>
+<div class="container">
 
+  <!-- تعريف المعلم -->
+  <div class="header">
+    <div class="name">الأستاذ إسماعيل سليمان حسن</div>
+    <div class="desc">معلم رياضيات وحاسوب – مدير مدرسة سابق<br>خبرة أكثر من 17 عامًا في التعليم – تخصص نظم المعلومات الإدارية</div>
+  </div>
+
+  <!-- تسجيل الدخول -->
+  <div id="login">
+    <h2>تسجيل دخول الطالب</h2>
+    <input type="text" id="studentName" placeholder="اسم الطالب">
+    <input type="password" id="studentPass" placeholder="كلمة المرور">
+    <br>
+    <button onclick="login()">دخول</button>
+    <p id="loginFeedback"></p>
+  </div>
+
+  <!-- اللعبة -->
+  <div id="game">
+    <h2>🎮 لعبة مشتقات الدوال المثلثية</h2>
+    <p id="question">اضغط "التالي" لبدء اللعبة</p>
+    <input type="text" id="answer" placeholder="اكتب مشتقة الدالة هنا">
+    <br>
+    <button onclick="checkAnswer()">تحقق</button>
+    <button onclick="nextQuestion()">التالي</button>
+    <p id="feedback"></p>
+    <div id="lesson"></div>
+    <button onclick="showLeaderboard()">🏆 لوحة الشرف</button>
+  </div>
+
+  <!-- لوحة الشرف -->
+  <div id="leaderboard">
+    <h3>لوحة الشرف</h3>
+    <ul id="scoresList"></ul>
+    <button onclick="hideLeaderboard()">إغلاق</button>
+  </div>
+</div>
+
+<script>
+const questions = [
+  {q:"ص = جاس³(2س)", a:"6 جاس²(2س) × جتاس(2س)", lesson:"شرح: مشتقة جاس³(u) = 3×جاس²(u)×جتاس(u) حيث u=2س → مضروب بـ 2."},
+  {q:"ص = ظا²(س+١)", a:"2 × ظا(س+١) × قا²(س+١)", lesson:"شرح: مشتقة ظا²(u) = 2×ظا(u)×قا²(u) حيث u=س+١."},
+  {q:"ص = جاس(3س) × جتا(2س)", a:"3 × جتاس(3س) × جتا(2س) - 2 × جاس(3س) × جاس(2س)", lesson:"شرح: استخدم قاعدة الضرب مع مشتقات الدوال المثلثية."},
+  {q:"ص = ظا(س+١) × س²", a:"2 × س × ظا(س+١) + س² × قا²(س+١)", lesson:"شرح: قاعدة الضرب + مشتقة الظا(س+١) = قا²(س+١)."}
+];
+
+let current = -1;
+let score = 0;
+let student = "";
+
+function login(){
+  const name = document.getElementById("studentName").value.trim();
+  const pass = document.getElementById("studentPass").value.trim();
+  if(name && pass){
+    student = name;
+    document.getElementById("login").style.display="none";
+    document.getElementById("game").style.display="block";
+    alert("مرحباً "+student+"! حظاً موفقاً في اللعبة 🎯");
+  } else {
+    document.getElementById("loginFeedback").innerText="الرجاء إدخال اسم وكلمة المرور";
+  }
+}
+
+function nextQuestion() {
+  current++;
+  if(current >= questions.length) current = 0;
+  document.getElementById("question").innerText = questions[current].q;
+  document.getElementById("answer").value = "";
+  document.getElementById("feedback").innerText = "";
+  document.getElementById("lesson").style.display="none";
+}
+
+function checkAnswer() {
+  const userAnswer = document.getElementById("answer").value.trim();
+  const correctAnswer = questions[current].a;
+  if(userAnswer === correctAnswer){
+    document.getElementById("feedback").innerText="✅ إجابة صحيحة!";
+    score +=10;
+    playSound(true);
+  } else {
+    document.getElementById("feedback").innerText="❌ إجابة خاطئة. الإجابة الصحيحة: "+correctAnswer;
+    playSound(false);
+  }
+  document.getElementById("lesson").innerText = questions[current].lesson;
+  document.getElementById("lesson").style.display="block";
+  saveScore();
+}
+
+function playSound(correct){
+  let audio = new Audio(correct ? "https://www.soundjay.com/button/beep-07.mp3" : "https://www.soundjay.com/button/beep-10.mp3");
+  audio.play();
+}
+
+function saveScore(){
+  let scores = JSON.parse(localStorage.getItem("scores") || "[]");
+  const found = scores.find(s=>s.name===student);
+  if(found){ found.score = score; } else { scores.push({name:student,score:score}); }
+  localStorage.setItem("scores", JSON.stringify(scores));
+}
+
+function showLeaderboard(){
+  const scores = JSON.parse(localStorage.getItem("scores") || "[]").sort((a,b)=>b.score-a.score);
+  const list = document.getElementById("scoresList");
+  list.innerHTML = "";
+  scores.forEach(s=>{
+    let li = document.createElement("li");
+    li.innerText = s.name+" : "+s.score+" نقطة";
+    list.appendChild(li);
+  });
+  document.getElementById("leaderboard").style.display="block";
+}
+
+function hideLeaderboard(){ document.getElementById("leaderboard").style.display="none"; }
+
+nextQuestion();
+</script>
+</body>
+</html>
