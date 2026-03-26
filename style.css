@@ -1,1 +1,9 @@
-
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; background: #f0f2f5; padding: 20px; }
+.container { background: white; max-width: 600px; margin: auto; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);}
+input { padding: 8px; width: 80%; margin-top: 10px; }
+button { padding: 10px 20px; margin-top: 10px; cursor: pointer; }
+#feedback { margin-top: 15px; font-weight: bold; }
+.header { margin-bottom: 15px; }
+.name { font-size: 20px; font-weight: bold; color: #2c3e50; }
+.desc { font-size: 14px; color: #555; }
+ul { text-align: right; padding-right: 20px; }
